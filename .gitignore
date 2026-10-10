@@ -1,0 +1,15 @@
+# The base ROM is never committed.
+baserom.gb
+*.gb
+*.gbc
+*.o
+*.sym
+*.map
+!/.gitignore
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Generated from gfx/*.png by build.sh
+*.2bpp
