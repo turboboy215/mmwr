@@ -1,10 +1,6 @@
 ;Mega Man: Dr. Wily's Revenge disassembly - ROM bank $02 (sound engine + music/SFX set A)
 ;Audio disassembly by Will Trowbridge. Verified byte-perfect against the base ROM.
 
-;Mega Man: Dr. Wily's Revenge audio disassembly (bank 1)
-;Disassembly by Will Trowbridge
-
-
 SECTION "Audio1", ROMX[AudioROM], BANK[$2]
 
 	jp Audio1_InitAudio
