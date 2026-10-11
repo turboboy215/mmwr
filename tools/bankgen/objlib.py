@@ -5,13 +5,13 @@
 HEAD = ";Mega Man: Dr. Wily's Revenge disassembly - the object library\n;\n;1794 bytes of helpers for object routines that banks $03, $09 and $0D each carry\n;a copy of, identical except for the addresses (bank $03 has it at $4042, $09 at\n;$4048, $0D at $401B). Each bank includes this file in its own pinned section with\n;OBJBANK set to its suffix, so every label here ends in {OBJBANK}: _09 for bank $09.\n;Local labels are numbered by offset from the start of the library, so they mean\n;the same in every copy. Added in step 5.2; confidence tags as elsewhere.\n"
 LEN = 0x702
 NAMES = {0x171: 'GiveBossFullEnergy',
- 0: 'ObjLibFunc_000',
+ 0: 'ObjGetPlayerZoneX',
  46: 'ObjStepX',
  60: 'ObjMoveX',
  86: 'AddSubpixel',
  98: 'ObjStepY',
  128: 'ObjMoveY',
- 141: 'ObjLibFunc_08D',
+ 141: 'ObjCheckPlayerWithinX',
  176: 'ObjArcStep',
  198: 'ObjCheckOutsideArena',
  216: 'ObjCheckArenaEdge',

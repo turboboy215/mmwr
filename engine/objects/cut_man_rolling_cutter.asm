@@ -120,7 +120,7 @@ CutManRollingCutterRoutine:	;$52CD
 	ld [hl], a
 	ld a, $0E
 	call JumpQueueSound
-	call ObjLibFunc_000_03
+	call ObjGetPlayerZoneX_03
 	ld a, $2F
 	add a, c
 	ld l, a

@@ -178,8 +178,8 @@ for _a, _t, _n in sorted(SLOTS):
 SHARED = ('engine/object_library.asm', 0x4048, 0x474A, 'OBJBANK', '_09')
 
 _LIB = {
- 0x4048: 'ObjLibFunc_000', 0x4076: 'ObjStepX', 0x4084: 'ObjMoveX', 0x409E: 'AddSubpixel',
- 0x40AA: 'ObjStepY', 0x40C8: 'ObjMoveY', 0x40D5: 'ObjLibFunc_08D', 0x40F8: 'ObjArcStep',
+ 0x4048: 'ObjGetPlayerZoneX', 0x4076: 'ObjStepX', 0x4084: 'ObjMoveX', 0x409E: 'AddSubpixel',
+ 0x40AA: 'ObjStepY', 0x40C8: 'ObjMoveY', 0x40D5: 'ObjCheckPlayerWithinX', 0x40F8: 'ObjArcStep',
  0x410E: 'ObjCheckOutsideArena', 0x4120: 'ObjCheckArenaEdge', 0x413D: 'BossKilled',
  0x4148: 'StartVictoryCountdown', 0x4157: 'InitBoss', 0x4194: 'StoreBossPosition',
  0x41A5: 'FillBossEnergy', 0x41B9: 'GiveBossFullEnergy', 0x41C4: 'UpdateBossEnergy', 0x41D3: 'CheckBossDead',

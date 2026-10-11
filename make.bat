@@ -1,6 +1,6 @@
 @echo off
 rem Mega Man: Dr. Wily's Revenge disassembly - Windows build
-rem Requires rgbasm/rgblink/rgbfix on PATH (or edit RGBDS below).
+rem Requires rgbasm/rgblink/rgbgfx on PATH (or edit RGBDS below).
 
 set RGBDS=
 
@@ -12,8 +12,6 @@ for %%f in (gfx\*.png gfx\sprites\*.png gfx\screens\*.png gfx\stages\*.png gfx\b
 %RGBDS%rgbasm -Weverything -Wno-obsolete -Wno-unmapped-char -o main.o main.asm
 if errorlevel 1 goto fail
 %RGBDS%rgblink -n mmwr.sym -m mmwr.map -o mmwr.gb main.o
-if errorlevel 1 goto fail
-%RGBDS%rgbfix -f hg mmwr.gb
 if errorlevel 1 goto fail
 
 fc /b mmwr.gb baserom.gb > nul

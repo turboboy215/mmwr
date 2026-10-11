@@ -9,8 +9,8 @@
 ;The audio engine's own block ($D93A-$DCBB) lives in ram/audio_ram.asm and is
 ;laid out properly there.
 ;
-;docs/RAMMAP.md has the full reference tally, including the ~100 addresses that
-;are touched but not yet understood.
+;docs/RAMMAP.md (tools/rammap.py, step 7.5) lists every RAM address the code
+;refers to, named or not, with its users and what the source says about it.
 
 ; ============================================================================
 ; $C000-$C0FF - display

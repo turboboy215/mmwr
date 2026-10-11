@@ -2,7 +2,7 @@
 
 ## Coverage
 
-`python3 tools/coverage.py --md`, as of step 7.3d (unchanged since 7.1):
+`python3 tools/coverage.py --md`, as of step 7.5 (unchanged since 7.1):
 
 | Bank | Assembly | Raw INCBIN | Padding | Bank done |
 |-----:|---------:|-----------:|--------:|----------:|
@@ -31,6 +31,70 @@ so bank `$0F` (all `$FF`) now reads 100%. Real content, without padding, is 194 
 
 ## Session log
 
+### Step 7.5 — final pass (2026-10-10). Phase 7 done; the plan is complete.
+
+* **Names:** `ObjLibFunc_000` → `ObjGetPlayerZoneX` (E = 4/3/2/1 for well left /
+  just left / just right / well right of the object's X, widened by the
+  half-width at offset `$34`; D = 1 on the right; used by Cut Man and the Rolling
+  Cutter) and `ObjLibFunc_08D` → `ObjCheckPlayerWithinX` (A = 1 if Mega Man is
+  within E px on side D; the fixed Metall sets D with `ObjFaceMegaMan` and asks
+  for `$28`). Both `;[ok]`, re-read against the code. Renamed in the library, the
+  three callers' files, `tools/bankgen/objlib.py`/`bank09.py` and UNUSED.md. No
+  provisional code label is left; the `Data_`/`Frame_`/`FrameTable_` data labels
+  still are (PLAN.md "After the plan").
+* **`docs/FORMATS.md`** (new): numbers and coordinates, graphics and pointer
+  chains, tilemaps, the five text encodings, metasprites, frames and animation
+  records, the object tables and record, stages (summary of LEVELS.md), weapons,
+  the three small pools, appearing-block schedules, passwords, stage-select
+  sprites, the roll call, audio (summary of AUDIO.md), the header.
+* **RAM map:** `tools/rammap.py` (new) expands main.asm's includes in order,
+  tracks each SECTION's bank from `mmwr.map`, and records every `ld`/`ldh`/`call`/
+  `jp`/`dw` operand that evaluates to WRAM or HRAM - names resolved through
+  `mmwr.sym` and the `def ... equ` constants. 586 addresses, 4,427 references;
+  247 named or inside a named block, 339 not. For each unnamed one it quotes the
+  source comment that mentions it, else its region, and lists the routines using
+  it. Two traps it handles: `ld hl,$FFxx` is usually a negative constant (kept
+  only when the next instruction dereferences the pair - `ObjMoveCollideY`'s
+  `ld hl,$FFA8 / ld a,[hl+]` is a real HRAM pointer), and fields reached by offset
+  (object slots, audio track RAM) are invisible to it by design. `docs/RAMMAP.md`
+  rebuilt: method, a fuller region table (sorted; `$C100`-`$C132`, `$DF00`
+  corrected from "hitbox list" to the solid-box list, new rows for `$CC40`-`$CC5D`,
+  `$D84E`-`$D876`, `$DCD0`-`$DDFB`, `$DFC5`-`$DFD4`, HRAM scratch), the generated
+  table, leads. **`$CD25` is not an address**: every one of the step-1.2 hits (and all 16 `21 25 CD` patterns in bank `$00`) is
+  `CD 21 25 CD` - `call $2521` followed by another `call`. That open question is
+  closed.
+* **Badges and CI:** README badges (byte-perfect, 100% source, RGBDS 0.9.4) and a
+  commented live-badge line for when the repository has a GitHub URL.
+  `build.sh` checks the output's SHA-256 when `baserom.gb` is absent (tested both
+  ways, and with a deliberately changed byte, which fails);
+  `.github/workflows/build.yml` builds RGBDS 0.9.4 (cached) and runs it.
+  `make.bat` is unchanged and still compares against `baserom.gb`.
+* **Bank `$0F`:** BANKS.md gains a free-space table per bank and a section on what
+  an expansion could do: the routes that already take a bank from a table
+  (`ObjectTypeTab`, `StageLoadTab` / `wStageBank`, the bank-`$01` trampoline),
+  what new object types or stages would also need (the bank-`$00` tables to move,
+  `LoadObjectTiles`' `$1E` test), and what does not stretch (audio banks).
+* Also: README brought up to date (layout, docs list, credits), CONVENTIONS.md's
+  text section lists all five charmaps, SESSION_START.md lists `rammap.py`.
+  ROM byte-identical throughout; coverage unchanged at 100.00%.
+
+### Step 7.4 — header checksums in source, no `rgbfix` (2026-10-10).
+
+* `engine/header.asm`: the header fields are now `HEADER_*` constants, emitted as
+  before, and `HeaderChecksum` is `LOW(-sum - 25)` over them - the boot ROM's own
+  rule (subtract each byte of `$0134`-`$014C` plus one). The title is summed
+  character by character with `STRSLICE` (a one-character string is a number in
+  RGBDS 0.9.4; no warnings under `-Weverything`). Verified both ways: the
+  unchanged source gives `$E4`, and a test build with the title "ROCKMAN WORLD"
+  and version 1 stored `$26`, matching an independent computation over the linked
+  bytes (then reverted).
+* `HeaderGlobalChecksum` is `db $C2, $5B`, written out: it covers the whole linked
+  ROM, which the assembler cannot see, and no Game Boy checks it. A modified ROM
+  keeps the old value unless fixed with `rgbfix -f g` (the header comment says so;
+  `tools/bootstrap-rgbds.sh` still installs `rgbfix` for that).
+* `build.sh` and `make.bat` now just assemble, link and compare. ROM byte-identical.
+  Next: 7.5.
+
 ### Step 7.3d — the last `Func_` labels, banks `$03`, `$0B`-`$0E` (2026-10-10). Step 7.3 done.
 
 * All 45 remaining `Func_BB_AAAA` labels renamed (`$03` 20, `$0D` 14, `$0E` 6, `$0B`
@@ -58,7 +122,7 @@ so bank `$0F` (all `$FF`) now reads 100%. Real content, without padding, is 194 
   B = 0 from mode 0; Cut, Elec, Fire, Flash Man and Enker return B = 1. What the
   spawner does with B = 0 from an init is not traced.
 * Still provisional, outside 7.3: the object library's `ObjLibFunc_000` and
-  `ObjLibFunc_08D` (both commented `[ok]`; added to 7.5) and the `Data_`/`Frame_`/
+  `ObjLibFunc_08D` (both commented `[ok]`; named in 7.5) and the `Data_`/`Frame_`/
   `FrameTable_` data labels (174/470/56). Next: 7.4.
 
 Old name -> new name (`Func_` dropped from the old names):

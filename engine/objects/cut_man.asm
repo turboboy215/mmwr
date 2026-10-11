@@ -146,7 +146,7 @@ CutManIntro:	;$47EE
 	ld [hl], $00
 	dec l
 	ld [hl], $00
-	call ObjLibFunc_000_03
+	call ObjGetPlayerZoneX_03
 	ld a, $2E
 	add a, c
 	ld l, a
@@ -182,7 +182,7 @@ CutManWalk:	;$482A
 	ld a, d
 	or a
 	jr z, .l4842
-	call ObjLibFunc_000_03
+	call ObjGetPlayerZoneX_03
 	ld a, $2E
 	add a, c
 	ld l, a
@@ -195,7 +195,7 @@ CutManWalk:	;$482A
 	ld [hl], d
 	jr .l484A
 .l4842
-	call ObjLibFunc_000_03
+	call ObjGetPlayerZoneX_03
 	ld a, $2E
 	add a, c
 	ld l, a
@@ -258,7 +258,7 @@ CutManJump:	;$487D
 	add a, c
 	ld l, a
 	ld [hl], $14
-	call ObjLibFunc_000_03
+	call ObjGetPlayerZoneX_03
 	ld a, $2E
 	add a, c
 	ld l, a
@@ -293,7 +293,7 @@ CutManJump:	;$487D
 	call CutManStartWalk
 .l48D7
 	call CutManCheckThrowTimer
-	call ObjLibFunc_000_03
+	call ObjGetPlayerZoneX_03
 	ld a, $2E
 	add a, c
 	ld l, a
@@ -320,7 +320,7 @@ CutManJump:	;$487D
 	ret
 
 CutManThrow:	;$48FD
-	call ObjLibFunc_000_03
+	call ObjGetPlayerZoneX_03
 	ld a, $24
 	add a, c
 	ld l, a
@@ -403,7 +403,7 @@ CutManWaitAfterThrow:	;$495F
 	ld [hl], $00
 	dec l
 	ld [hl], $00
-	call ObjLibFunc_000_03
+	call ObjGetPlayerZoneX_03
 	ld a, $2E
 	add a, c
 	ld l, a

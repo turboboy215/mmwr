@@ -342,16 +342,44 @@ The code is done; what is missing is the analysis.
     renamed, none kept provisional. **No `Func_BB_AAAA` label is left in the
     source.** Still provisional by design: the object library's two
     `ObjLibFunc_000`/`ObjLibFunc_08D` (named by library offset, both fully
-    commented) and the `Data_`/`Frame_`/`FrameTable_` data labels - see 7.5.
-- [ ] **7.4 — Drop `rgbfix` from the build** by putting the real header bytes
-  (logo, title, checksums) in source. *Mostly done in 2.2:* logo, title, licensee
-  ($08 Capcom), cartridge type, sizes and destination are source; `rgbfix -f hg`
-  now only fills the two checksums.
-- [ ] **7.5 — Final pass:** `docs/FORMATS.md`, a complete RAM map, a build badge,
-  and a note on what a `$0F`-bank expansion hack could do with 16 KB of free space.
-  Also name the library's `ObjLibFunc_000` (Mega Man's side of the object, 4 zones)
-  and `ObjLibFunc_08D` (is Mega Man within E px), whose comments already say what
-  they do.
+    commented; named in 7.5) and the `Data_`/`Frame_`/`FrameTable_` data labels
+    (still provisional after 7.5 - see "After the plan").
+- [x] **7.4 — Drop `rgbfix` from the build** by putting the real header bytes
+  (logo, title, checksums) in source. Logo, title, licensee, type, sizes and
+  destination were source since 2.2; now the header checksum (`$014D`) is computed
+  by the assembler from the header fields (so edits to them stay bootable) and the
+  global checksum (`$014E`, checked by no Game Boy) is written out as `$C25B`.
+  `build.sh` and `make.bat` no longer call `rgbfix`.
+- [x] **7.5 — Final pass.** Done (2026-10-10):
+  - the library's two provisional labels named: `ObjGetPlayerZoneX` (was
+    `ObjLibFunc_000`: which of four zones Mega Man's X is in, relative to the
+    object and a half-width at offset `$34`) and `ObjCheckPlayerWithinX` (was
+    `ObjLibFunc_08D`: is he within E px on side D), both `;[ok]`;
+  - `docs/FORMATS.md`: every data format in one place, linking to LEVELS.md and
+    AUDIO.md for the long ones;
+  - a complete RAM map: `tools/rammap.py` reads the source as rgbasm does and lists
+    all 586 RAM addresses the code refers to (247 named or inside a named block,
+    339 not), with uses, banks, routines and what the source's comments say;
+    `docs/RAMMAP.md` rebuilt around it. The step-1.2 lead `$CD25` was a byte-scan
+    false positive (`call $2521` + `call`);
+  - build badges in README.md, and `build.sh` now checks the output's SHA-256 when
+    there is no `baserom.gb`, so `.github/workflows/build.yml` can verify the build
+    on GitHub without the ROM (the live Actions badge needs the repository's URL);
+  - BANKS.md: free space per bank and what a bank-`$0F` expansion could do with
+    the existing banked routes (object types, stages, bank-`$01` callbacks).
+
+  **Phase 7 is complete, and with it the plan.**
+
+## After the plan
+
+Optional, in no order - none of it changes what the ROM assembles to:
+
+* Name the `Data_`/`Frame_`/`FrameTable_` labels in the object banks (animation
+  records and frame tables; FORMATS.md has their formats).
+* Name the most-used unnamed RAM (`tools/rammap.py --unnamed`), where the source
+  comments already say what an address is.
+* The open questions carried forward in the project's plan document and the
+  PROGRESS.md log (e.g. what B = 0 from a boss init does, `$DF96`'s bit layout).
 
 ---
 

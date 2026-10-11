@@ -71,6 +71,9 @@ python3 tools/leveldump.py baserom.gb [--stage N] [--png DIR [--objects] [--bloc
                                                   dump or render stage data (docs/LEVELS.md);
                                                   give it mmwr.gb to preview an edited stage
 python3 tools/stageselect.py baserom.gb out.png   stage-select robot master sprites (bank $07)
+python3 tools/rammap.py [--md|--unnamed|--sites ADDR]
+                                                  every RAM address the source refers to,
+                                                  with users (docs/RAMMAP.md; build first)
 sh tools/roundtrip.sh START END N                 prove that output reassembles exactly
 python3 tools/bankgen.py tools/bankgen/bankNN.py   bootstrap a whole bank into source from a
                                                   config (entry points, data items, names,

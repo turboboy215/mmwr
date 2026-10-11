@@ -115,8 +115,9 @@ The game has several encodings and RGBDS charmaps are global, so:
 
 * plain-ASCII strings (the bank `$00` boss names) use the default `main` charmap;
 * screen text uses the named `screen` charmap from `constants/charmap.inc`;
-* the weapon-get strings use the named `getscreen` charmap;
-* the bank `$0E` roll call (ASCII − `$20`) will need a fourth when it is extracted.
+* the weapon-get strings (and bank `$01`'s "AND CARRY") use the named `getscreen` charmap;
+* the pause menu's weapon letters use `menu`, and the bank `$0E` roll call
+  (ASCII − `$20`) uses `rollcall`. docs/FORMATS.md has all five rules.
 
 Wrap text in `SETCHARMAP <name>` … `SETCHARMAP main` and always switch back.
 If a string comes out wrong, `./build.sh` will say so — the charmap is the thing

@@ -7,10 +7,12 @@
 ;Local labels are numbered by offset from the start of the library, so they mean
 ;the same in every copy. Added in step 5.2; confidence tags as elsewhere.
 
-;Compare Mega Man's X with the object's (offset $0D) widened by offset $34:
-;E = 4/3/2/1 for "well left", "just left", "just right", "well right" of it, and
-;D = 1 on the right-hand side. Not called in bank $09.	;[ok]
-ObjLibFunc_000{OBJBANK}:	;+$000
+;Which of four zones Mega Man's X is in, relative to the object's X (offset $0D)
+;and a half-width W (offset $34): E = 4 well left (X+W < obj), 3 just left,
+;2 just right (X-W < obj), 1 well right; D = 1 on the right-hand side, else 0.
+;Used by Cut Man and his Rolling Cutter (bank $03); not called in bank $09.
+;Named in 7.5 (was ObjLibFunc_000).	;[ok]
+ObjGetPlayerZoneX{OBJBANK}:	;+$000
 	ld a, $34
 	add a, c
 	ld l, a
@@ -141,10 +143,11 @@ ObjMoveY{OBJBANK}:	;+$080
 	ld [hl], a
 	ret
 
-;A = 1 if Mega Man has not passed the line E pixels from the object: his X is
-;below its X + E (D != 0) or at least its X - E (D = 0); else 0. Used by
-;bank $03's type 17, not by bank $09.	;[ok]
-ObjLibFunc_08D{OBJBANK}:	;+$08D
+;A = 1 if Mega Man is within E pixels of the object on side D (his X below its
+;X + E when D != 0, at least its X - E when D = 0), else 0. The caller puts the
+;side in D first: the fixed Metall (type 17, bank $03) calls ObjFaceMegaMan, so
+;this asks "is he within $28 px". Named in 7.5 (was ObjLibFunc_08D).	;[ok]
+ObjCheckPlayerWithinX{OBJBANK}:	;+$08D
 	ld a, d
 	or a
 	jr z, .o0A1

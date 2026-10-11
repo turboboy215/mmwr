@@ -253,7 +253,7 @@ MetallFixedWait:	;$77EA
 	call ObjFaceMegaMan_03
 	ld b, $04
 	ld e, $28
-	call ObjLibFunc_08D_03
+	call ObjCheckPlayerWithinX_03
 	or a
 	jp z, MetallSetFrame
 	ld a, $27

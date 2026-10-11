@@ -209,6 +209,73 @@ carry uninitialised-memory filler: 32-byte `$00`/`$FF` runs keyed on address bit
 in opposite phase in the two banks, with five stray set bits each. Step 7.1 writes it
 as `uninit_fill` (`macros/filler.inc`). Nothing reads it, so it is free space too.
 
+### Free space by bank (step 7.5)
+
+`$FF` tails, from the ROM (the build writes each as `ds $8000 - @, $FF`):
+
+| Bank | Free from | Bytes | | Bank | Free from | Bytes |
+|---|---|---:|---|---|---|---:|
+| `$00` | `$3979` | 1,671 | | `$08` | `$7829` | 2,007 |
+| `$01` | `$738D` | 3,187 | | `$09` | `$7D32` | 718 |
+| `$02` | `$7CA2` | 862 | | `$0A` | `$720D` | 3,571 |
+| `$03` | `$7BE5` | 1,051 | | `$0B` | `$55D0` | 10,800 |
+| `$04` | `$6FE0` | 4,128 + filler from `$63F8` | | `$0C` | `$7395` | 3,179 |
+| `$05` | `$7000` | 4,096 + filler from `$6AAD` | | `$0D` | `$6311` | 7,407 |
+| `$06` | `$7BB7` | 1,097 | | `$0E` | `$7BAF` | 1,105 |
+| `$07` | `$7813` | 2,029 | | `$0F` | `$4000` | 16,384 |
+
+## Bank `$0F`: what an expansion could do with it (step 7.5)
+
+Bank `$0F` is 16 KB of `$FF` that nothing switches to (no `ld a,$0F` feeds a bank
+switch; step 7.2). The cartridge is MBC1 with 16 banks, so it is the only whole
+bank a hack gets without growing the ROM - and growing it is easy now: the
+header's ROM-size byte is a `HEADER_*` constant and the header checksum is
+computed by the assembler (step 7.4), so a 512 KB build only needs the constant
+changed and the new banks declared. What follows is a map of the existing
+routes into a bank, as a starting point, not a tested recipe.
+
+**Routes that already take a bank number from a table** - the cheapest ways in,
+because the engine pages the bank in itself:
+
+* **Object types.** `ObjectTypeTab` (`$3693`) gives each type a handler address
+  and a bank, and the object loop pages that bank in around every call ("How banking
+  works" above). A bank `$0F` laid out like `$03`/`$09`/`$0D` - an
+  entry table of `jp`s at `$4000`, a copy of `engine/object_library.asm` (include
+  it with `OBJBANK` set to `_0F`), then the routines - can hold new enemies or
+  replacements for existing ones. Pointing an existing type's record at bank
+  `$0F` is a two-byte change. *New* type numbers need room in four tables that
+  are pinned in bank `$00` with code right after them - `ObjectStatsTab` (8 bytes
+  a type), `ObjectTypeTab` (4), `ObjectTilesetPtrs` (2) and, for a boss,
+  `BossDamageTab` - so they would have to move into bank `$00`'s 1,671 free bytes
+  and their users be repointed (`SpawnObject`, `LoadObjectTiles`, the `$01B9`
+  pointer pair the object banks read). `LoadObjectTiles` also hard-codes where
+  tiles come from - bank `$04` below type `$1E`, bank `$07` from `$1E` up - so a
+  new type's tiles go in bank `$07` (2,029 bytes free) unless that test changes.
+* **Stages.** `StageLoadTab` (`$2F93`) gives each stage a ROM0 pointer slot and a
+  bank, stored in `wStageBank`, which `LoadStage`, the loaders and the per-frame
+  call to the stage hook (`StageFrameLoop`) all page in. A stage in bank `$0F`
+  therefore keeps its data, room routines, init and frame hook there. The table
+  has eight records and is followed by code, so a ninth stage means moving it
+  (and `LoadStage`'s `ld hl, StageLoadTab - 4`), adding a ROM0 pointer slot, and
+  entries in `StageMusicTab` and the stage tileset pointers; the Wily stage select and the
+  ending decide which stages are reachable. The format and macros are in
+  LEVELS.md - eight stages' worth of examples.
+* **Bank `$01` callbacks.** Code in any bank can call bank `$01`'s routines through
+  `wBank1Trampoline` (banks `$0B`, `$0C`, `$0E` do), so new code in `$0F` can reuse
+  the player, weapon, item and explosion code.
+
+**Routes that do not stretch as easily:** audio (`wAudioBank` only ever holds
+`$02` or `$0A`, and each audio bank carries its own copy of the driver - a third
+sound bank would need a third driver copy, or new songs in the 862 + 3,571 free
+bytes of the existing two; AUDIO.md §10); and graphics loaded by fixed `BANK()`
+references in bank `$00` (move the data, update the reference).
+
+**What 16 KB is, in this game's units:** bank `$05` holds the four robot master
+stages and their per-stage code in about 11 KB, and bank `$03` holds 22 object
+types, its entry table and its object-library copy in about 15 KB. So bank `$0F`
+is room for roughly another four stages, or another object bank's worth of
+enemies - not both.
+
 ## What the audio disassembly already tells us
 
 `audio/bank02.asm` holds the whole sound engine, and [AUDIO.md](AUDIO.md) describes

@@ -1,0 +1,29 @@
+# Build the ROM from source and check it against the known SHA-256 of
+# "Megaman - Dr. Wily's Revenge (U) [!].gb". The ROM itself is never in the
+# repository: since step 7.2 no source file reads it, so the hash is the test.
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools for RGBDS
+        run: sudo apt-get update && sudo apt-get install -y cmake bison libpng-dev pkg-config
+      - name: Cache RGBDS
+        id: rgbds
+        uses: actions/cache@v4
+        with:
+          path: ~/bin
+          key: rgbds-v0.9.4-${{ runner.os }}
+      - name: Build RGBDS 0.9.4
+        if: steps.rgbds.outputs.cache-hit != 'true'
+        run: sh tools/bootstrap-rgbds.sh
+      - name: Build and verify
+        run: |
+          export PATH="$HOME/bin:$PATH"
+          sh build.sh
